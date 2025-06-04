@@ -1,33 +1,40 @@
-import { Body, Controller, Delete, Get, Param, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
 import { UserService } from './user.service';
 import { AuthService } from './auth.service';
+import { identity } from 'rxjs';
 
-@Controller('user')
+@Controller('users')
 export class UserController {
     constructor(
-        private readonly UserService: UserService, 
+        private readonly userService: UserService, 
         private readonly authService: AuthService) 
         {
         }
     @Get()
-        index(@Query() query: any) {
-            return{
-                keyword: query.keyword,
-                category: query.category,
-            };
+        index() {
+            return this.userService.findAll();
+        
         // return [this.UserService.getUsers(), this.authService.login()];
     }
+    
     @Get('/:id')
-        find(@Param('id')id: string){
-            return `user with id ${id}`;
-        }
+    findOne(@Param('id') id: string) {
+        return this.userService.findOne(+id);
+    }
     
     @Post()
-        crreat(@Body() body: any) {
-        return body; 
+        create(@Body() body: any) {
+        return this.userService.create(body);
     }
-    @Delete()
-        delete() {
-        return 'delete user';
+
+    @Patch('/:id')
+     update(@Param('id') id: string, @Body() body: any ){
+        return this.userService.update(+id, body)
+     }
+
+    @Delete('/:id')
+        delete(@Param('id') id: string) {
+            return this.userService.delete(+id)
+       
     }
 }
